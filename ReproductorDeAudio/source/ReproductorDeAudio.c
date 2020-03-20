@@ -42,6 +42,7 @@
 #include "fsl_port.h"
 #include "fsl_tpm.h"
 #include "fsl_clock.h"
+
 /* TODO: insert other include files here. */
 
 /* TODO: insert other definitions and declarations here. */
