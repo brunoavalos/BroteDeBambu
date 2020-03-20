@@ -45,7 +45,7 @@
 /* TODO: insert other include files here. */
 
 /* TODO: insert other definitions and declarations here. */
-
+void PWM_Init(void);
 /*
  * @brief   Application entry point.
  */
@@ -58,6 +58,24 @@ int main(void) {
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
 
+	PWM_Init();
+
+	PRINTF("Hello World\n");
+
+	/* Force the counter to be placed into memory. */
+	volatile static int i = 0 ;
+	/* Enter an infinite loop, just incrementing a counter. */
+	while(1) {
+		i++ ;
+		/* 'Dummy' NOP to allow source level single stepping of
+            tight while() loop */
+		__asm volatile ("nop");
+	}
+	return 0 ;
+}
+
+void PWM_Init(void)
+{
 	CLOCK_EnableClock(kCLOCK_PortB);                           /* Port B Clock Gate Control: Clock enabled */
 	PORT_SetPinMux(PORTB, 19u, kPORT_MuxAlt3);           /* PORTB19 (pin 54) is configured as TPM2_CH1 */
 
@@ -79,17 +97,4 @@ int main(void) {
 	TPM_SetupPwm(TPM2, &tpmParam, 1U, kTPM_CenterAlignedPwm, 24000U, CLOCK_GetFreq(kCLOCK_PllFllSelClk));
 
 	TPM_StartTimer(TPM2, kTPM_SystemClock);
-
-	PRINTF("Hello World\n");
-
-	/* Force the counter to be placed into memory. */
-	volatile static int i = 0 ;
-	/* Enter an infinite loop, just incrementing a counter. */
-	while(1) {
-		i++ ;
-		/* 'Dummy' NOP to allow source level single stepping of
-            tight while() loop */
-		__asm volatile ("nop");
-	}
-	return 0 ;
 }
