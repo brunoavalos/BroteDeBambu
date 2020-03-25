@@ -42,11 +42,16 @@
 #include "fsl_port.h"
 #include "fsl_tpm.h"
 #include "fsl_clock.h"
+#include "fsl_pit.h"
 
 /* TODO: insert other include files here. */
+#define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
+
+unsigned char rub_Tick;
 
 /* TODO: insert other definitions and declarations here. */
-void PWM_Init(void);
+void app_PWM_Init(void);
+void app_PIT_Init(void);
 /*
  * @brief   Application entry point.
  */
@@ -59,7 +64,8 @@ int main(void) {
 	/* Init FSL debug console. */
 	BOARD_InitDebugConsole();
 
-	PWM_Init();
+	app_PIT_Init(); //Inicializacion de PIT
+	app_PWM_Init(); //Inicializacion de PWM
 
 	PRINTF("Hello World\n");
 
@@ -75,7 +81,7 @@ int main(void) {
 	return 0 ;
 }
 
-void PWM_Init(void)
+void app_PWM_Init(void)
 {
 	CLOCK_EnableClock(kCLOCK_PortB);                           /* Port B Clock Gate Control: Clock enabled */
 	PORT_SetPinMux(PORTB, 19u, kPORT_MuxAlt3);           /* PORTB19 (pin 54) is configured as TPM2_CH1 */
@@ -98,4 +104,37 @@ void PWM_Init(void)
 	TPM_SetupPwm(TPM2, &tpmParam, 1U, kTPM_CenterAlignedPwm, 24000U, CLOCK_GetFreq(kCLOCK_PllFllSelClk));
 
 	TPM_StartTimer(TPM2, kTPM_SystemClock);
+}
+
+void app_PIT_Init(void)
+{
+	rub_Tick = false;
+
+	pit_config_t pitConfig;
+	/*
+	 * pitConfig.enableRunInDebug = false;
+	 */
+	PIT_GetDefaultConfig(&pitConfig);
+
+	/* Init pit module */
+	PIT_Init(PIT, &pitConfig);
+
+	/* Set timer period for channel 0 */
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(1000U, PIT_SOURCE_CLOCK));
+
+	/* Enable timer interrupts for channel 0 */
+	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+
+	/* Enable at the NVIC */
+	EnableIRQ(PIT_IRQn);
+
+	/* Start channel 0 */
+	PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
+void PIT_IRQHandler(void)
+{
+	/* Clear interrupt flag.*/
+	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+	rub_Tick = true;
 }
