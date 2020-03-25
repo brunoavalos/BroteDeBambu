@@ -53,3 +53,5 @@ dkms.conf
 /.metadata/
 
 .mcuxpressoide_packages_support/
+
+ReproductorDeAudio/Debug/
