@@ -13,4 +13,6 @@
 
 #define APP_DEBBTN_GET_VALID_STATE()			rub_ValidBtnState
 
+extern void app_DebBtn_SM_ButtonDebounce(void);
+
 #endif /* APP_DEBBTN_H_ */

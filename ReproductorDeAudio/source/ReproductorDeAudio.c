@@ -43,6 +43,7 @@
 #include "fsl_tpm.h"
 #include "fsl_clock.h"
 #include "fsl_pit.h"
+#include "app_DebBtn.h"
 
 /* TODO: insert other include files here. */
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
@@ -67,10 +68,6 @@ int main(void) {
 	app_PIT_Init(); //Inicializacion de PIT
 	app_PWM_Init(); //Inicializacion de PWM
 
-	PRINTF("Hello World\n");
-
-	/* Force the counter to be placed into memory. */
-	volatile static int i = 0 ;
 	/* Enter an infinite loop, just incrementing a counter. */
 	while(1) {
 		if(rub_Tick == true)
